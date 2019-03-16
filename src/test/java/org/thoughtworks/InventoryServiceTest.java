@@ -95,4 +95,64 @@ public class InventoryServiceTest {
         service.applyTransaction(order1);
         assertEquals(2650, service.getSalesPrice());
     }
+
+    @Test
+    public void testTransportationCharge() {
+        int amount1=3;
+        int amount2=10;
+        int amount3=15;
+        int amount4=39;
+        int amount5=44;
+        int amount6=0;
+        int amount7=1;
+
+        assertEquals(400, service.getTransportaionCharge(amount1));
+        assertEquals(400, service.getTransportaionCharge(amount2));
+        assertEquals(800, service.getTransportaionCharge(amount3));
+        assertEquals(1600, service.getTransportaionCharge(amount4));
+        assertEquals(2000, service.getTransportaionCharge(amount5));
+        assertEquals(0, service.getTransportaionCharge(amount6));
+        assertEquals(400, service.getTransportaionCharge(amount7));
+
+    }
+
+    @Test
+    public void testForeignInventoryPrice() throws Exception {
+        Order order1 = service.readOrder("INPUT 1: BRAZIL:B123AB1234567:IPHONE:110:IPOD:110 OUTPUT 1: 2650:90:100:80:50");
+        assertEquals(3300, service.calculateForeignInventoryPrice(-10, -10,order1));
+
+        Order order2 = service.readOrder("INPUT 1: BRAZIL:B123AB1234567:IPHONE:100:IPOD:100 OUTPUT 1: 2650:90:100:80:50");
+        assertEquals(0, service.calculateForeignInventoryPrice(0,0,order2));
+    }
+
+    @Test
+    public void testIphonePriceFromLocalInventory() {
+
+        // 10 * 100
+        // 10 * 65
+        // 1650 * .20 = 1600
+        Order order1 = service.readOrder(InventoryConstants.input1);
+        service.applyTransaction(order1);
+        assertEquals(2650, service.getSalesPrice());
+    }
+
+    @Test
+    public void testInput2() {
+        // 22 * 150 3300
+        // 10 * 100 1000
+        // total 4300
+        Order order2 = service.readOrder(InventoryConstants.input2);
+        service.applyTransaction(order2);
+        assertEquals(3910, service.getSalesPrice());
+    }
+
+    @Test
+    public void testInput5() {
+        // 22 * 150 3300
+        // 10 * 100 1000
+        // total 4300
+        Order order2 = service.readOrder(InventoryConstants.input5);
+        service.applyTransaction(order2);
+        assertEquals(1850, service.getSalesPrice());
+    }
 }

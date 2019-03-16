@@ -1,5 +1,7 @@
 package org.thoughtworks.model;
 
+import org.thoughtworks.business.Inventory;
+
 public class Order {
     private int orderNumber;
     private Country purchaseCountry;
@@ -7,6 +9,7 @@ public class Order {
     private int purchsedIpod;
     private String passportNumber;
     private int customerNumber;
+    private Inventory localInventory;
 
     public int getOrderNumber() {
         return orderNumber;
@@ -18,6 +21,10 @@ public class Order {
 
     public Country getPurchaseCountry() {
         return purchaseCountry;
+    }
+
+    public Inventory getLocalInventory() {
+        return localInventory;
     }
 
     public void setPurchaseCountry(Country purchaseCountry) {
