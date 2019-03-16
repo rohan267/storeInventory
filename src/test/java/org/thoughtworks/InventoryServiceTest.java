@@ -93,6 +93,6 @@ public class InventoryServiceTest {
     public void testCalculateDiscountedPrice() {
         Order order1 = service.readOrder(InventoryConstants.input1);
         service.applyTransaction(order1);
-        assertEquals(2650, new Double(service.getSalesPrice()).intValue());
+        assertEquals(2650, service.getSalesPrice());
     }
 }

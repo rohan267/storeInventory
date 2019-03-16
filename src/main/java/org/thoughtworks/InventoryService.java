@@ -22,7 +22,7 @@ public class InventoryService {
     // update stock
     private Inventory brazilInventory;
     private Inventory argentinaInventory;
-    private double salesPrice=0;
+    private int salesPrice=0;
 
     public InventoryService() {
         this.brazilInventory = new InventoryBrazil();
@@ -54,12 +54,17 @@ public class InventoryService {
         }
     }
 
-    private int calculateNonDiscountedPrice(Order oder) {
+    private int calculateNonDiscountedPrice(Order order) {
 
-        return 0;
+        return new Double(salesPrice + calculateTransportationCharge(order)).intValue();
     }
 
-    private double calculateDiscountedPrice(Order order) {
+    private double calculateTransportationCharge(Order order) {
+//        if()
+        return 0.0;
+    }
+
+    private int calculateDiscountedPrice(Order order) {
         switch (order.getPurchaseCountry()) {
             case BRAZIL:
                 salesPrice = order.getPurchasedIphone() * brazilInventory.getIphoneCost()
@@ -70,7 +75,7 @@ public class InventoryService {
                     + order.getPurchsedIpod() * argentinaInventory.getIpodCost();
                 break;
         }
-        return salesPrice * InventoryConstants.DISCOUNT_VALUE;
+        return new Double(salesPrice * InventoryConstants.DISCOUNT_VALUE).intValue();
     }
 
     private void getInventory(Order order) {
@@ -107,7 +112,7 @@ public class InventoryService {
         return argentinaInventory;
     }
 
-    public double getSalesPrice() {
+    public int getSalesPrice() {
         return salesPrice;
     }
 }
