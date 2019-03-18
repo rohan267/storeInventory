@@ -1,5 +1,6 @@
 package org.thoughtworks.business;
 
+import org.thoughtworks.model.Order;
 import org.thoughtworks.model.Product;
 import org.thoughtworks.util.InventoryConstants;
 
@@ -41,4 +42,5 @@ public class InventoryBrazil extends Product implements Inventory {
     public int getIpodCost() {
         return InventoryConstants.BRAZIL_IPOD_COST;
     }
+
 }

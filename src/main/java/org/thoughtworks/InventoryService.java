@@ -1,5 +1,6 @@
 package org.thoughtworks;
 
+import org.thoughtworks.business.CalculationService;
 import org.thoughtworks.business.Inventory;
 import org.thoughtworks.business.InventoryArgentina;
 import org.thoughtworks.business.InventoryBrazil;
@@ -9,7 +10,7 @@ import org.thoughtworks.util.InventoryConstants;
 
 import static org.thoughtworks.util.InventoryConstants.TRANSPORTATION_COST;
 
-public class InventoryService {
+public class InventoryService extends CalculationService {
 
     // create brazil inventory - done
     // create Argentina inventory - done
@@ -37,10 +38,17 @@ public class InventoryService {
         input = input.replace(" ", "");
         input = input.substring(0, input.indexOf("OUTPUT"));
         String[] inputArray = input.split(":");
-        order.setPurchaseCountry(Country.valueOf(inputArray[1]));
-        order.setPassportNumber(inputArray[2]);
-        order.setPurchasedIphone(Integer.parseInt(inputArray[4]));
-        order.setPurchsedIpod(Integer.parseInt(inputArray[6]));
+        if (inputArray.length == 7) {
+            order.setPurchaseCountry(Country.valueOf(inputArray[1]));
+            order.setPassportNumber(inputArray[2]);
+            order.setPurchasedIphone(Integer.parseInt(inputArray[4]));
+            order.setPurchsedIpod(Integer.parseInt(inputArray[6]));
+        } else if (inputArray.length == 6) {
+            order.setPurchaseCountry(Country.valueOf(inputArray[1]));
+            order.setPassportNumber("");
+            order.setPurchasedIphone(Integer.parseInt(inputArray[3]));
+            order.setPurchsedIpod(Integer.parseInt(inputArray[5]));
+        }
 
         return order;
     }
@@ -50,31 +58,31 @@ public class InventoryService {
             int iphoneStockDifference = 0;
             int ipodStockDifference = 0;
             int totalPrice = 0;
-            if(order.getPurchaseCountry().equals(Country.BRAZIL)) {
+            if (order.getPurchaseCountry().equals(Country.BRAZIL)) {
                 iphoneStockDifference = brazilInventory.getIphoneStock() - order.getPurchasedIphone();
                 ipodStockDifference = brazilInventory.getIpodStock() - order.getPurchsedIpod();
 
-                if(iphoneStockDifference < 0) {
+                if (iphoneStockDifference < 0) {
                     totalPrice += calculateForeignInventoryPrice(iphoneStockDifference, 0, order);
                 } else {
                     totalPrice += getIphonePriceFromLocalInventory(brazilInventory, order);
                 }
 
-                if(ipodStockDifference < 0) {
+                if (ipodStockDifference < 0) {
                     totalPrice += calculateForeignInventoryPrice(0, ipodStockDifference, order);
                 } else {
                     totalPrice += getIpodPriceFromLocalInventory(brazilInventory, order);
                 }
-            } else if(order.getPurchaseCountry().equals(Country.ARGENTINA)) {
+            } else if (order.getPurchaseCountry().equals(Country.ARGENTINA)) {
                 iphoneStockDifference = argentinaInventory.getIphoneStock() - order.getPurchasedIphone();
                 ipodStockDifference = argentinaInventory.getIpodStock() - order.getPurchsedIpod();
-                if(iphoneStockDifference < 0) {
+                if (iphoneStockDifference < 0) {
                     totalPrice += calculateForeignInventoryPrice(iphoneStockDifference, 0, order);
                 } else {
                     totalPrice += getIphonePriceFromLocalInventory(argentinaInventory, order);
                 }
 
-                if(ipodStockDifference < 0) {
+                if (ipodStockDifference < 0) {
                     totalPrice += calculateForeignInventoryPrice(0, ipodStockDifference, order);
                 } else {
                     totalPrice += getIpodPriceFromLocalInventory(argentinaInventory, order);
@@ -91,6 +99,54 @@ public class InventoryService {
         }
     }
 
+
+    public void checkOutCart(Order order) {
+        int iphoneOrderPrice = 0;
+        int ipodOrderPrice = 0;
+
+        Inventory localInventory = order.findLocalInventory(brazilInventory, argentinaInventory);
+        Inventory foreignInventory = order.findForeignInventory(brazilInventory, argentinaInventory);
+
+        iphoneOrderPrice = getIphoneOrderPrice(order, localInventory);
+
+        // TODO: calculate partial local-foreign inventory calculation
+//        int shortageOfIphoneStockInLocalInventory = localInventory.cal(order);
+//        if (shortageOfIphoneStockInLocalInventory < 0) {
+//            iphoneOrderPrice = (shortageOfIphoneStockInLocalInventory * -1) * foreignInventory.getIphoneCost();
+//            foreignInventory.updateIphoneStock(order.getPurchasedIphone());
+//        }
+
+        ipodOrderPrice = getIpodOrderPrice(order, localInventory);
+
+//        int shortageOfIpodStockInLocalInventory = localInventory.checkLocalInventoryIphoneStock(order);
+//        if (shortageOfIpodStockInLocalInventory < 0) {
+//            ipodOrderPrice = (shortageOfIpodStockInLocalInventory * -1) * foreignInventory.getIpodCost();
+//            foreignInventory.updateIpodStock(order.getPurchsedIpod());
+//        }
+
+        salesPrice = iphoneOrderPrice + ipodOrderPrice;
+
+        // if enough stock - calculate price for local inventory - done
+        // else differentiate the amount of local stock and foreign stock
+        //   calculate price for local inventory
+        //   calculate price for foreign inventory
+        //   make total of local and foreign inventory price
+    }
+
+    private int getIpodOrderPrice(Order order, Inventory localInventory) {
+        int ipodOrderPrice = calculateIpodPrice(order, localInventory);
+        localInventory.updateIpodStock(order.getPurchsedIpod());
+        return ipodOrderPrice;
+    }
+
+    private int getIphoneOrderPrice(Order order, Inventory localInventory) {
+        int iphoneOrderPrice = calculateIphonePrice(order, localInventory);
+        localInventory.updateIphoneStock(order.getPurchasedIphone());
+        return iphoneOrderPrice;
+    }
+
+
+    /** prior code **/
     public int calculateForeignInventoryPrice(int iphoneStockDifference, int ipodStockDifference, Order order) {
         int foreignInventoryIphonePice = 0;
         int foreignInventoryIpodPice = 0;
@@ -99,7 +155,7 @@ public class InventoryService {
                 if (iphoneStockDifference < 0) {
                     foreignInventoryIphonePice = getIphonePriceFromForeignInventory(iphoneStockDifference * -1, argentinaInventory);
                 }
-                if(ipodStockDifference < 0) {
+                if (ipodStockDifference < 0) {
                     foreignInventoryIpodPice = getIpodPriceFromForeignInventory(ipodStockDifference * -1, argentinaInventory);
                 }
                 break;
@@ -107,7 +163,7 @@ public class InventoryService {
                 if (iphoneStockDifference < 0) {
                     foreignInventoryIphonePice = getIphonePriceFromForeignInventory(iphoneStockDifference * -1, brazilInventory);
                 }
-                if(ipodStockDifference < 0) {
+                if (ipodStockDifference < 0) {
                     foreignInventoryIpodPice = getIpodPriceFromForeignInventory(ipodStockDifference * -1, brazilInventory);
                 }
                 break;
@@ -135,7 +191,7 @@ public class InventoryService {
     }
 
     public int getTransportaionCharge(int itemAmount) {
-        return  itemAmount > 0 ? ((itemAmount - 1) / 10 + 1) * TRANSPORTATION_COST : 0;
+        return itemAmount > 0 ? ((itemAmount - 1) / 10 + 1) * TRANSPORTATION_COST : 0;
     }
 
     public void remainderTest(int num) {
@@ -148,13 +204,15 @@ public class InventoryService {
 
     public boolean isDiscountApplicable(Order order) {
 
-        if (order.getPurchaseCountry().equals(Country.BRAZIL)
+        if (order.getPassportNumber().length() > 0
+                && order.getPurchaseCountry().equals(Country.BRAZIL)
                 && order.getPassportNumber().charAt(0) == 'B') {
             return true;
         }
 
-        if(order.getPurchaseCountry().equals(Country.ARGENTINA)
-            && order.getPassportNumber().charAt(0) == 'A') {
+        if (order.getPassportNumber().length() > 0
+                && order.getPurchaseCountry().equals(Country.ARGENTINA)
+                && order.getPassportNumber().charAt(0) == 'A') {
             return true;
         }
 

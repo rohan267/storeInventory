@@ -1,5 +1,7 @@
 package org.thoughtworks.business;
 
+import org.thoughtworks.model.Country;
+import org.thoughtworks.model.Order;
 import org.thoughtworks.model.Product;
 import org.thoughtworks.util.InventoryConstants;
 

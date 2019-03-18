@@ -92,8 +92,16 @@ public class InventoryServiceTest {
     @Test
     public void testCalculateDiscountedPrice() {
         Order order1 = service.readOrder(InventoryConstants.input1);
-        service.applyTransaction(order1);
+        service.checkOutCart(order1);
         assertEquals(2650, service.getSalesPrice());
+    }
+
+    @Test
+    public void testVerifyProductStock() {
+        Order order1 = service.readOrder(InventoryConstants.input1);
+        service.checkOutCart(order1);
+        assertEquals(80, service.getBrazilInventory().getIphoneStock());
+        assertEquals(90, service.getBrazilInventory().getIpodStock());
     }
 
     @Test
@@ -148,11 +156,13 @@ public class InventoryServiceTest {
 
     @Test
     public void testInput5() {
-        // 22 * 150 3300
-        // 10 * 100 1000
-        // total 4300
+        // 50 * 100 5000
+        // 100 * 65 6500
+        // 50 * 100 5000
+        // 5 * 400 2000
+        // total 16500 + 2000 = 18500
         Order order2 = service.readOrder(InventoryConstants.input5);
         service.applyTransaction(order2);
-        assertEquals(1850, service.getSalesPrice());
+        assertEquals(18500, service.getSalesPrice());
     }
 }

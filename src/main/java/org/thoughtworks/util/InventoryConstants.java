@@ -27,5 +27,4 @@ public class InventoryConstants {
     public static final String input5 = "INPUT 5: BRAZIL:IPHONE:50:IPOD:150 OUTPUT 5: 18500:0:50:50:50";
     public static final String input6 = "INPUT 6: BRAZIL:IPHONE:250:IPOD:150 OUTPUT 6: OUT_OF_STOCK:100:100:100:50";
 
-
 }

@@ -1,6 +1,8 @@
 package org.thoughtworks.model;
 
 import org.thoughtworks.business.Inventory;
+import org.thoughtworks.business.InventoryArgentina;
+import org.thoughtworks.business.InventoryBrazil;
 
 public class Order {
     private int orderNumber;
@@ -23,8 +25,20 @@ public class Order {
         return purchaseCountry;
     }
 
-    public Inventory getLocalInventory() {
-        return localInventory;
+    public Inventory findLocalInventory(Inventory inventoryBrazil, Inventory inventoryArgentina) {
+        if(this.purchaseCountry.equals(Country.BRAZIL)) {
+            return inventoryBrazil;
+        } else {
+            return inventoryArgentina;
+        }
+    }
+
+    public Inventory findForeignInventory(Inventory inventoryBrazil, Inventory inventoryArgentina) {
+        if(this.purchaseCountry.equals(Country.BRAZIL)) {
+            return inventoryArgentina;
+        } else {
+            return inventoryBrazil;
+        }
     }
 
     public void setPurchaseCountry(Country purchaseCountry) {

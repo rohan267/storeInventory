@@ -1,6 +1,7 @@
 package org.thoughtworks.business;
 
 import org.thoughtworks.model.Country;
+import org.thoughtworks.model.Order;
 
 public interface Inventory {
 
@@ -17,4 +18,5 @@ public interface Inventory {
     public int getIphoneCost();
 
     public int getIpodCost();
+
 }
