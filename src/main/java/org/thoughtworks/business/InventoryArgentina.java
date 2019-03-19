@@ -15,13 +15,24 @@ public class InventoryArgentina extends Product implements Inventory {
     }
 
     @Override
-    public void updateIpodStock(int purchasedIphone) {
-        ipodStock = iphoneStock - purchasedIphone;
+    public void updateIpodStock(int purchasedIpod) {
+        int newIpodStock = ipodStock - purchasedIpod;
+
+        if(newIpodStock >=0) {
+            ipodStock = newIpodStock;
+        } else {
+            ipodStock = 0;
+        }
     }
 
     @Override
-    public void updateIphoneStock(int purchasedIpod) {
-        ipodStock = ipodStock = purchasedIpod;
+    public void updateIphoneStock(int purchasedIphone) {
+        int newStock = iphoneStock - purchasedIphone;
+        if(newStock  >= 0)  {
+            iphoneStock = newStock;
+        } else {
+            iphoneStock = 0;
+        }
     }
 
     @Override

@@ -90,19 +90,30 @@ public class InventoryServiceTest {
     }
 
     @Test
-    public void testCalculateDiscountedPrice() {
+    public void testCalculateLocalInventoryPrice() {
         Order order1 = service.readOrder(InventoryConstants.input1);
         service.checkOutCart(order1);
         assertEquals(2650, service.getSalesPrice());
+//        assertEquals(80, service.getBrazilInventory().getIphoneStock());
+//        assertEquals(90, service.getBrazilInventory().getIpodStock());
     }
 
     @Test
-    public void testVerifyProductStock() {
-        Order order1 = service.readOrder(InventoryConstants.input1);
+    public void testCalculatePricePartialOrderFromDifferentInventories() {
+        String partialOrder = "INPUT 1: BRAZIL:B123AB1234567:IPHONE:110:IPOD:110 OUTPUT 1: 2650:90:100:80:50";
+        Order order1 = service.readOrder(partialOrder);
         service.checkOutCart(order1);
-        assertEquals(80, service.getBrazilInventory().getIphoneStock());
-        assertEquals(90, service.getBrazilInventory().getIpodStock());
+        assertEquals(19000, service.getSalesPrice());
+//        assertEquals(0, service.getBrazilInventory().getIphoneStock());
+//        assertEquals(0, service.getBrazilInventory().getIpodStock());
+//        assertEquals(40, service.getArgentinaInventory().getIphoneStock());
+//        assertEquals(90, service.getArgentinaInventory().getIpodStock());
     }
+
+
+
+
+
 
     @Test
     public void testTransportationCharge() {

@@ -101,47 +101,41 @@ public class InventoryService extends CalculationService {
 
 
     public void checkOutCart(Order order) {
-        int iphoneOrderPrice = 0;
+        int iphoneOrderPriceLocalInventory = 0;
         int ipodOrderPrice = 0;
 
         Inventory localInventory = order.findLocalInventory(brazilInventory, argentinaInventory);
         Inventory foreignInventory = order.findForeignInventory(brazilInventory, argentinaInventory);
 
-        iphoneOrderPrice = getIphoneOrderPrice(order, localInventory);
+        iphoneOrderPriceLocalInventory = getIphoneOrderPrice(order, localInventory);
 
-        // TODO: calculate partial local-foreign inventory calculation
-//        int shortageOfIphoneStockInLocalInventory = localInventory.cal(order);
-//        if (shortageOfIphoneStockInLocalInventory < 0) {
-//            iphoneOrderPrice = (shortageOfIphoneStockInLocalInventory * -1) * foreignInventory.getIphoneCost();
-//            foreignInventory.updateIphoneStock(order.getPurchasedIphone());
-//        }
+        int numberOfIphoneForeignInventory = order.getPurchasedIphone() - localInventory.getIphoneStock();
+
+        int totalIphoneCostForeignInventory=0;
+        if(numberOfIphoneForeignInventory > 0) {
+            totalIphoneCostForeignInventory = calculateIphonePriceForeignInventory(numberOfIphoneForeignInventory, argentinaInventory);
+        }
 
         ipodOrderPrice = getIpodOrderPrice(order, localInventory);
+        int numberOfIpodForeignInventory = order.getPurchsedIpod() - localInventory.getIpodStock();
 
-//        int shortageOfIpodStockInLocalInventory = localInventory.checkLocalInventoryIphoneStock(order);
-//        if (shortageOfIpodStockInLocalInventory < 0) {
-//            ipodOrderPrice = (shortageOfIpodStockInLocalInventory * -1) * foreignInventory.getIpodCost();
-//            foreignInventory.updateIpodStock(order.getPurchsedIpod());
-//        }
+        int totalIpodCostForeignInventory=0;
+        if(numberOfIpodForeignInventory > 0) {
+            totalIpodCostForeignInventory = calculateIpodPriceForeignInventory(numberOfIphoneForeignInventory, argentinaInventory);
+        }
 
-        salesPrice = iphoneOrderPrice + ipodOrderPrice;
+        // TODO : Inventory stock update
+        salesPrice = iphoneOrderPriceLocalInventory + totalIphoneCostForeignInventory + ipodOrderPrice + totalIpodCostForeignInventory;
 
-        // if enough stock - calculate price for local inventory - done
-        // else differentiate the amount of local stock and foreign stock
-        //   calculate price for local inventory
-        //   calculate price for foreign inventory
-        //   make total of local and foreign inventory price
     }
 
     private int getIpodOrderPrice(Order order, Inventory localInventory) {
-        int ipodOrderPrice = calculateIpodPrice(order, localInventory);
-        localInventory.updateIpodStock(order.getPurchsedIpod());
+        int ipodOrderPrice = calculateIpodPrice(order.getPurchsedIpod(), localInventory);
         return ipodOrderPrice;
     }
 
     private int getIphoneOrderPrice(Order order, Inventory localInventory) {
-        int iphoneOrderPrice = calculateIphonePrice(order, localInventory);
-        localInventory.updateIphoneStock(order.getPurchasedIphone());
+        int iphoneOrderPrice = calculateIphonePrice(order.getPurchasedIphone(), localInventory);
         return iphoneOrderPrice;
     }
 
